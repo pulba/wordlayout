@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WordLayout Pro - MS Word Auto-Formatter & Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #1E40AF;
+      --primary-hover: #1D4ED8;
+      --secondary: #0F172A;
+      --accent: #0D9488;
+      --accent-hover: #0F766E;
+      --neutral-bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-border: #E2E8F0;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --danger: #EF4444;
+      --success: #10B981;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--neutral-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), #3B82F6);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      border-radius: var(--radius-md);
+      font-size: 1.2rem;
+      box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--secondary);
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .nav-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .nav-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 45%, #0D9488 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .hero-content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-content p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      max-width: 760px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background-color: var(--primary); color: white; }
+    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+    .btn-accent { background-color: var(--accent); color: white; }
+    .btn-accent:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+    .btn-success { background-color: var(--success); color: white; }
+    .btn-success:hover { background-color: #059669; transform: translateY(-1px); }
+    .btn-white { background-color: white; color: var(--primary); font-weight: 700; }
+    .btn-white:hover { background-color: #F1F5F9; }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 410px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1000px) {
+      .grid-main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropzone {
+      border: 2px dashed #93C5FD;
+      background: #F0F7FF;
+      border-radius: var(--radius-lg);
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: #E0EFFF;
+      transform: scale(1.01);
+    }
+
+    .dropzone-icon { font-size: 2.8rem; margin-bottom: 10px; display: block; }
+    .dropzone-title { font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 4px; }
+    .dropzone-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; }
+    .file-input { display: none; }
+
+    .file-loaded-info {
+      display: none;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 16px;
+    }
+
+    .file-loaded-info.show { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preset-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .preset-item {
+      padding: 14px;
+      border: 2px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .preset-item:hover { border-color: #93C5FD; background: #F8FAFC; }
+    .preset-item.active { border-color: var(--primary); background: #EFF6FF; }
+
+    .preset-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .preset-desc { font-size: 0.8rem; color: var(--text-secondary); }
+    .preset-tag {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: var(--surface-border);
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .preset-item.active .preset-tag { background: var(--primary); color: white; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
+    .form-control {
+      padding: 8px 10px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      background: #FFFFFF;
+    }
+    .form-control:focus { outline: 2px solid var(--primary); }
+
+    .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+    .check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+    .stat-card {
+      background: #F8FAFC;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-num { font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1.2; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; font-weight: 600; }
+
+    .log-box {
+      background: #0F172A;
+      color: #E2E8F0;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      max-height: 240px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+
+    .log-item { display: flex; gap: 8px; }
+    .log-time { color: #64748B; }
+    .log-success { color: #34D399; }
+    .log-info { color: #60A5FA; }
+    .log-warn { color: #FBBF24; }
+
+    .action-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="brand">
+        <div class="logo-badge">W</div>
+        <div class="brand-text">
+          <h1>WordLayout Pro <span>⚡ Section & Page Break Engine</span></h1>
+          <p>Mirror Margins, Indent 0.68cm, Roman/Arabic Bottom Center Page Numbers</p>
+        </div>
+      </div>
+      <div class="nav-links">
+        <span class="nav-badge" id="nav-preset-badge">Karya Ilmiah Standar (Arial 11pt)</span>
+        <button class="btn btn-accent" onclick="loadSampleDocx()">🧪 Test Sample Dokumen</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Hero Banner -->
+    <div class="hero">
+      <div class="hero-content">
+        <h2>Format Dokumen Word Otomatis (Section Break + Page Break + Mirror)</h2>
+        <p>Cover terpisah otomatis <strong>Section Break Next Page</strong> (Different First Page), Bagian Awal bernomor <strong>Romawi (i, ii, iii)</strong>, Bagian Inti BAB 1 s.d. seterusnya bernomor <strong>Angka (1, 2, 3)</strong> di <strong>Bottom Center</strong>, serta dukungan <strong>Mirror Margins</strong> untuk buku cetak!</p>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="document.getElementById('file-input').click()">📂 Pilih File .docx</button>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid-main">
+      
+      <!-- Left Column: Preset & Rules -->
+      <aside>
+        
+        <!-- Preset Selector -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">⚙️ Preset Layout</span>
+          </div>
+          <div class="preset-list">
+            
+            <div class="preset-item active" id="p-ummetro" onclick="selectPreset('ummetro')">
+              <div class="preset-title">
+                <span>Karya Ilmiah Standar (4-3-3-3)</span>
+                <span class="preset-tag">Official</span>
+              </div>
+              <p class="preset-desc">Arial 11pt, Margin Kiri 4cm Atas/Kanan/Bawah 3cm, Spasi 1.5, Indent 1.27cm, Page Break per Bab, Tabel APA, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+            </div>
+
+            <div class="preset-item" id="p-buku_cetak" onclick="selectPreset('buku_cetak')">
+              <div class="preset-title">
+                <span>Buku Cetak (Mirror Margins)</span>
+                <span class="preset-tag">Buku Cetak</span>
+              </div>
+              <p class="preset-desc"><strong>Mirror Margins Aktif</strong>, Indent First-Line <strong>0.68 cm</strong>, Book Antiqua 10.5pt, Spasi 1.15, B5, <em>Auto Intense Quote ("...")</em>, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+            </div>
+
+            <div class="preset-item" id="p-nasional" onclick="selectPreset('nasional')">
+              <div class="preset-title">
+                <span>Skripsi Standar (4-4-3-3)</span>
+                <span class="preset-tag">Nasional</span>
+              </div>
+              <p class="preset-desc">Times New Roman 12pt, Margin 4-4-3-3, Spasi 2.0 (Double), Justify, Indent 1.27cm, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+            </div>
+
+            <div class="preset-item" id="p-novel_a5" onclick="selectPreset('novel_a5')">
+              <div class="preset-title">
+                <span>Novel Cetak (A5 Mirror)</span>
+                <span class="preset-tag">Novel</span>
+              </div>
+              <p class="preset-desc">Mirror Margins, Indent 0.68 cm, Garamond 11pt, A5 (14.8x21cm), Spasi 1.15, <em>Auto Intense Quote ("...")</em>, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Detail Parameters -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🎛️ Konfigurasi Halaman & Section</span>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Ukuran Kertas</label>
+              <select id="param-paper" class="form-control">
+                <option value="a4">A4 (21.0 x 29.7 cm)</option>
+                <option value="b5">B5 (18.2 x 25.7 cm)</option>
+                <option value="a5">A5 (14.8 x 21.0 cm)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Multiple Pages</label>
+              <select id="param-multiple-pages" class="form-control">
+                <option value="normal">Normal</option>
+                <option value="mirror">Mirror Margins (Cetak Buku)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Font Utama</label>
+              <select id="param-font" class="form-control">
+                <option value="Arial">Arial</option>
+                <option value="Book Antiqua">Book Antiqua</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Garamond">Garamond</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Ukuran Font</label>
+              <select id="param-fontsize" class="form-control">
+                <option value="11">11 pt</option>
+                <option value="10.5">10.5 pt</option>
+                <option value="12">12 pt</option>
+                <option value="10">10 pt</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Spasi Baris</label>
+              <select id="param-spacing" class="form-control">
+                <option value="1.5">1.5 Spasi</option>
+                <option value="1.15">1.15 Spasi</option>
+                <option value="2.0">2.0 Spasi (Double)</option>
+                <option value="1.0">1.0 Spasi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>First-Line Indent (cm)</label>
+              <input type="number" id="param-indent" class="form-control" value="1.27" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Margin Kiri / Inside (cm)</label>
+              <input type="number" id="param-m-left" class="form-control" value="4.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>Margin Atas (cm)</label>
+              <input type="number" id="param-m-top" class="form-control" value="3.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>Margin Kanan / Outside (cm)</label>
+              <input type="number" id="param-m-right" class="form-control" value="3.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>Margin Bawah (cm)</label>
+              <input type="number" id="param-m-bottom" class="form-control" value="3.0" step="0.1">
+            </div>
+          </div>
+
+          <div class="check-list">
+            <label class="check-item">
+              <input type="checkbox" id="check-section-breaks" checked>
+              <span><strong>Section Break Next Page</strong> (Setelah Cover & Sebelum Bab)</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="check-pagebreak-front" checked>
+              <span><strong>Page Break</strong> pada Heading 1 di Bagian Awal</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="check-pagenum-rule" checked>
+              <span><strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1)</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="check-intense-quote" checked>
+              <span><strong>Intense Quote Otomatis</strong> untuk Kutipan Panjang ("...") di Buku & Novel</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="check-fix-tables" checked>
+              <span>Format Tabel Standar APA 7th (Tanpa Border Vertikal)</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="check-clean-spaces" checked>
+              <span>Bersihkan Spasi Ganda & Tanda Baca Menggantung</span>
+            </label>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right Column: Upload, Processing & Download -->
+      <main>
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📥 Upload File Word (.docx)</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);" id="file-size-status">Format .docx didukung</span>
+          </div>
+
+          <input type="file" id="file-input" class="file-input" accept=".docx" onchange="handleFileSelect(event)">
+          
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <span class="dropzone-icon">📄</span>
+            <div class="dropzone-title">Tarik & Lepas File .docx ke Sini</div>
+            <div class="dropzone-desc">atau klik untuk memilih file dari komputer kamu</div>
+            <button class="btn btn-primary" type="button">Pilih Dokumen Word</button>
+          </div>
+
+          <div class="file-loaded-info" id="file-loaded-info">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong id="loaded-file-name" style="color: #065F46; font-size: 0.95rem;">document.docx</strong>
+                <div id="loaded-file-meta" style="font-size: 0.8rem; color: #047857; margin-top: 2px;">Ukuran: 0 KB | Tipe: Dokumen Word OpenXML</div>
+              </div>
+              <span class="nav-badge">Siap Diformat</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-bar">
+            <button class="btn btn-success" id="btn-process" onclick="processAndGenerateDocx()" disabled style="font-size: 1rem; padding: 12px 24px;">
+              <span class="loading-spinner" id="loading-spinner"></span>
+              <span id="btn-process-text">⚡ Format Sekarang & Download</span>
+            </button>
+            <button class="btn btn-accent" id="btn-reprocess" onclick="processAndGenerateDocx()" style="display: none;">
+              🔄 Format Ulang
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Processing Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-sections">0</div>
+            <div class="stat-label">Section Dikelola</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-headings">0</div>
+            <div class="stat-label">Heading Terstruktur</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-pagebreaks">0</div>
+            <div class="stat-label">Page/Section Breaks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-quotes">0</div>
+            <div class="stat-label">Intense Quotes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-tables">0</div>
+            <div class="stat-label">Tabel APA Style</div>
+          </div>
+        </div>
+
+        <!-- Activity Audit Log -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📝 Log Pemrosesan OpenXML Engine</span>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">Section & Footer Builder</span>
+          </div>
+          <div class="log-box" id="log-box">
+            <div class="log-item"><span class="log-time">[System]</span> <span class="log-info">WordLayout Pro Engine Siap. Unggah file .docx atau klik tombol 'Test Sample Dokumen'.</span></div>
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    // Presets configuration
+    const presets = {
+      ummetro: {
+        paper: "a4",
+        multiplePages: "normal",
+        font: "Arial",
+        fontsize: "11",
+        spacing: "1.5",
+        indent: 1.27,
+        left: 4.0,
+        top: 3.0,
+        right: 3.0,
+        bottom: 3.0,
+        name: "Karya Ilmiah Standar (Arial 11pt)"
+      },
+      buku_cetak: {
+        paper: "b5",
+        multiplePages: "mirror",
+        font: "Book Antiqua",
+        fontsize: "10.5",
+        spacing: "1.15",
+        indent: 0.68,
+        left: 2.5,
+        top: 2.5,
+        right: 2.0,
+        bottom: 2.0,
+        name: "Buku Cetak (B5 Mirror Indent 0.68)"
+      },
+      nasional: {
+        paper: "a4",
+        multiplePages: "normal",
+        font: "Times New Roman",
+        fontsize: "12",
+        spacing: "2.0",
+        indent: 1.27,
+        left: 4.0,
+        top: 4.0,
+        right: 3.0,
+        bottom: 3.0,
+        name: "Skripsi Standar (TNR 12pt 2.0)"
+      },
+      novel_a5: {
+        paper: "a5",
+        multiplePages: "mirror",
+        font: "Garamond",
+        fontsize: "11",
+        spacing: "1.15",
+        indent: 0.68,
+        left: 2.0,
+        top: 2.0,
+        right: 1.5,
+        bottom: 1.5,
+        name: "Novel Cetak (A5 Mirror Indent 0.68)"
+      }
+    };
+
+    let currentFile = null;
+    let currentPresetKey = 'ummetro';
+
+    function selectPreset(key) {
+      currentPresetKey = key;
+      document.querySelectorAll('.preset-item').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`p-${key}`);
+      if (activeEl) activeEl.classList.add('active');
+
+      const p = presets[key];
+      document.getElementById('param-paper').value = p.paper;
+      document.getElementById('param-multiple-pages').value = p.multiplePages;
+      document.getElementById('param-font').value = p.font;
+      document.getElementById('param-fontsize').value = p.fontsize;
+      document.getElementById('param-spacing').value = p.spacing;
+      document.getElementById('param-indent').value = p.indent;
+      document.getElementById('param-m-left').value = p.left;
+      document.getElementById('param-m-top').value = p.top;
+      document.getElementById('param-m-right').value = p.right;
+      document.getElementById('param-m-bottom').value = p.bottom;
+
+      document.getElementById('nav-preset-badge').innerText = p.name;
+      addLog(`Preset aktif: ${p.name}`, 'info');
+    }
+
+    // Check if text is a multi-line quote with double quotes at start & end
+    function isMultiLineQuote(txt) {
+      const trimmed = txt.trim();
+      // Length >= 70 characters qualifies as more than 1 line in standard layout
+      if (trimmed.length < 70) return false;
+      
+      const startQuotes = ['"', '“', '”', '«', '„'];
+      const endQuotes = ['"', '“', '”', '»'];
+      const firstChar = trimmed.charAt(0);
+      const lastChar = trimmed.charAt(trimmed.length - 1);
+      const secondLastChar = trimmed.length > 1 ? trimmed.charAt(trimmed.length - 2) : '';
+      
+      const hasStartQuote = startQuotes.includes(firstChar);
+      const hasEndQuote = endQuotes.includes(lastChar) || 
+                          (endQuotes.includes(secondLastChar) && ['.', ',', '!', '?', ';', ':'].includes(lastChar));
+      return hasStartQuote && hasEndQuote;
+    }
+
+    // Drag & Drop
+    const dropzone = document.getElementById('dropzone');
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) handleFile(files[0]);
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    }
+
+    function handleFile(file) {
+      if (!file.name.endsWith('.docx')) {
+        alert('Harap unggah file dokumen berformat .docx!');
+        return;
+      }
+      currentFile = file;
+      document.getElementById('loaded-file-name').innerText = file.name;
+      document.getElementById('loaded-file-meta').innerText = `Ukuran: ${(file.size / 1024).toFixed(1)} KB | Tipe: Dokumen Word OpenXML`;
+      document.getElementById('file-loaded-info').classList.add('show');
+      document.getElementById('btn-process').disabled = false;
+      addLog(`File dimuat: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'success');
+    }
+
+    function addLog(msg, type = 'info') {
+      const logBox = document.getElementById('log-box');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = 'log-item';
+      const colorClass = type === 'success' ? 'log-success' : (type === 'warn' ? 'log-warn' : 'log-info');
+      div.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
+      logBox.appendChild(div);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function cmToDxa(cm) {
+      return Math.round(parseFloat(cm) * 567);
+    }
+
+    function ptToHalfPt(pt) {
+      return Math.round(parseFloat(pt) * 2);
+    }
+
+    function spacingToVal(sp) {
+      const s = parseFloat(sp);
+      if (s === 1.5) return 360;
+      if (s === 2.0) return 480;
+      if (s === 1.15) return 276;
+      return 240;
+    }
+
+    function isFrontMatterTitle(txt) {
+      const t = txt.toUpperCase().trim();
+      return (
+        t === "KATA PENGANTAR" ||
+        t === "DAFTAR ISI" ||
+        t === "DAFTAR TABEL" ||
+        t === "DAFTAR GAMBAR" ||
+        t === "DAFTAR LAMPIRAN" ||
+        t === "ABSTRAK" ||
+        t === "ABSTRACT" ||
+        t === "HALAMAN PENGESAHAN" ||
+        t === "HALAMAN PERSETUJUAN" ||
+        t === "HALAMAN PERSEMBAHAN" ||
+        t === "HALAMAN MOTTO" ||
+        t === "PERNYATAAN TIDAK PLAGIAT" ||
+        t === "PERNYATAAN ORISINALITAS"
+      );
+    }
+
+    function isChapterTitle(txt) {
+      const t = txt.toUpperCase().trim();
+      return (
+        t.startsWith("BAB ") ||
+        t === "DAFTAR PUSTAKA" ||
+        t === "DAFTAR LITERATUR" ||
+        t === "DAFTAR REFERENSI" ||
+        t === "LAMPIRAN" ||
+        t === "LAMPIRAN-LAMPIRAN" ||
+        t === "RIWAYAT HIDUP"
+      );
+    }
+
+    // Build footer xml: Plain Number 2 (bottom center page number)
+    function buildFooterXml() {
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:p>
+    <w:pPr>
+      <w:jc w:val="center"/>
+    </w:pPr>
+    <w:r>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <w:instrText xml:space="preserve"> PAGE </w:instrText>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="separate"/>
+    </w:r>
+    <w:r>
+      <w:t>1</w:t>
+    </w:r>
+    <w:r>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+  </w:p>
+</w:ftr>`;
+    }
+
+    // Build empty footer xml (for cover first page)
+    function buildEmptyFooterXml() {
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:p/>
+</w:ftr>`;
+    }
+
+    // Generate/Inject word/styles.xml with proper Heading 1-4 & Normal styles
+    function buildStylesXml(fontName, fontHalfPt, lineSpacingVal, firstLineDxa) {
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault>
+      <w:rPr>
+        <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:eastAsia="${fontName}" w:cs="${fontName}"/>
+        <w:sz w:val="${fontHalfPt}"/>
+        <w:szCs w:val="${fontHalfPt}"/>
+        <w:lang w:val="id-ID"/>
+      </w:rPr>
+    </w:rPrDefault>
+    <w:pPrDefault>
+      <w:pPr>
+        <w:spacing w:line="${lineSpacingVal}" w:lineRule="auto" w:before="0" w:after="0"/>
+        <w:jc w:val="both"/>
+      </w:pPr>
+    </w:pPrDefault>
+  </w:docDefaults>
+
+  <!-- Normal Style -->
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+    <w:qFormat/>
+    <w:pPr>
+      <w:spacing w:line="${lineSpacingVal}" w:lineRule="auto" w:before="0" w:after="0"/>
+      <w:jc w:val="both"/>
+      <w:ind w:firstLine="${firstLineDxa}"/>
+    </w:pPr>
+    <w:rPr>
+      <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/>
+      <w:sz w:val="${fontHalfPt}"/>
+      <w:color w:val="000000"/>
+    </w:rPr>
+  </w:style>
+
+  <!-- Intense Quote Style (For Multi-line Quotes in Books & Novels) -->
+  <w:style w:type="paragraph" w:styleId="IntenseQuote">
+    <w:name w:val="Intense Quote"/>
+    <w:basedOn w:val="Normal"/>
+    <w:uiPriority w:val="29"/>
+    <w:qFormat/>
+    <w:pPr>
+      <w:pBdr>
+        <w:top w:val="single" w:sz="6" w:space="4" w:color="1E40AF"/>
+        <w:bottom w:val="single" w:sz="6" w:space="4" w:color="1E40AF"/>
+      </w:pBdr>
+      <w:spacing w:before="180" w:after="180" w:line="${lineSpacingVal}" w:lineRule="auto"/>
+      <w:jc w:val="both"/>
+      <w:ind w:left="720" w:right="720" w:firstLine="0"/>
+    </w:pPr>
+    <w:rPr>
+      <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/>
+      <w:i/>
+      <w:sz w:val="${fontHalfPt}"/>
+      <w:color w:val="1E3A8A"/>
+    </w:rPr>
+  </w:style>
+
+  <!-- Heading 1: BAB / Bagian Awal (Kapital, Bold, Center, KeepNext) -->
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:basedOn w:val="Normal"/>
+    <w:next w:val="Normal"/>
+    <w:uiPriority w:val="1"/>
+    <w:qFormat/>
+    <w:pPr>
+      <w:keepNext/>
+      <w:spacing w:before="240" w:after="240" w:line="${lineSpacingVal}" w:lineRule="auto"/>
+      <w:jc w:val="center"/>
+      <w:outlineLvl w:val="0"/>
+      <w:ind w:firstLine="0"/>
+    </w:pPr>
+    <w:rPr>
+      <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/>
+      <w:b/>
+      <w:caps/>
+      <w:sz w:val="${fontHalfPt}"/>
+      <w:color w:val="000000"/>
+    </w:rPr>
+  </w:style>
+
+  <!-- Heading 2: A. Sub-bab (Bold, Left, KeepNext) -->
+  <w:style w:type="paragraph" w:styleId="Heading2">
+    <w:name w:val="heading 2"/>
+    <w:basedOn w:val="Normal"/>
+    <w:next w:val="Normal"/>
+    <w:uiPriority w:val="2"/>
+    <w:qFormat/>
+    <w:pPr>
+      <w:keepNext/>
+      <w:spacing w:before="180" w:after="80" w:line="${lineSpacingVal}" w:lineRule="auto"/>
+      <w:jc w:val="left"/>
+      <w:outlineLvl w:val="1"/>
+      <w:ind w:firstLine="0"/>
+    </w:pPr>
+    <w:rPr>
+      <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/>
+      <w:b/>
+      <w:sz w:val="${fontHalfPt}"/>
+      <w:color w:val="000000"/>
+    </w:rPr>
+  </w:style>
+
+  <!-- Heading 3: 1. Sub-sub-bab (Bold, Left, KeepNext) -->
+  <w:style w:type="paragraph" w:styleId="Heading3">
+    <w:name w:val="heading 3"/>
+    <w:basedOn w:val="Normal"/>
+    <w:next w:val="Normal"/>
+    <w:uiPriority w:val="3"/>
+    <w:qFormat/>
+    <w:pPr>
+      <w:keepNext/>
+      <w:spacing w:before="140" w:after="60" w:line="${lineSpacingVal}" w:lineRule="auto"/>
+      <w:jc w:val="left"/>
+      <w:outlineLvl w:val="2"/>
+      <w:ind w:firstLine="0"/>
+    </w:pPr>
+    <w:rPr>
+      <w:rFonts w:ascii="${fontName}" w:hAnsi="${fontName}" w:cs="${fontName}"/>
+      <w:b/>
+      <w:sz w:val="${fontHalfPt}"/>
+      <w:color w:val="000000"/>
+    </w:rPr>
+  </w:style>
+</w:styles>`;
+    }
+
+    // Core Processing & Generator Function
+    async function processAndGenerateDocx() {
+      if (!currentFile) return;
+
+      const spinner = document.getElementById('loading-spinner');
+      const btnText = document.getElementById('btn-process-text');
+      const btnProcess = document.getElementById('btn-process');
+      
+      spinner.style.display = 'inline-block';
+      btnText.innerText = 'Menata Section Breaks, Page Breaks & Nomor Halaman...';
+      btnProcess.disabled = true;
+
+      try {
+        addLog('Membuka file arsip docx...', 'info');
+        const zip = await JSZip.loadAsync(currentFile);
+        
+        const docXmlFile = zip.file("word/document.xml");
+        if (!docXmlFile) throw new Error("File word/document.xml tidak ditemukan!");
+
+        const docXmlStr = await docXmlFile.async("string");
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(docXmlStr, "text/xml");
+        const wNS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        const rNS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+        // Read user options
+        const fontName = document.getElementById('param-font').value;
+        const fontHalfPt = ptToHalfPt(document.getElementById('param-fontsize').value);
+        const lineSpacingVal = spacingToVal(document.getElementById('param-spacing').value);
+        const firstLineDxa = cmToDxa(document.getElementById('param-indent').value);
+        const isMirror = document.getElementById('param-multiple-pages').value === "mirror";
+
+        const mLeftDxa = cmToDxa(document.getElementById('param-m-left').value);
+        const mTopDxa = cmToDxa(document.getElementById('param-m-top').value);
+        const mRightDxa = cmToDxa(document.getElementById('param-m-right').value);
+        const mBottomDxa = cmToDxa(document.getElementById('param-m-bottom').value);
+        
+        const paperType = document.getElementById('param-paper').value;
+        let paperW = 11906, paperH = 16838, paperCode = "9"; // A4
+        if (paperType === 'b5') { paperW = 10318; paperH = 14570; paperCode = "13"; }
+        if (paperType === 'a5') { paperW = 8390; paperH = 11906; paperCode = "11"; }
+
+        const optSectionBreaks = document.getElementById('check-section-breaks').checked;
+        const optPageBreakFront = document.getElementById('check-pagebreak-front').checked;
+        const optPageNum = document.getElementById('check-pagenum-rule').checked;
+        const optIntenseQuote = document.getElementById('check-intense-quote').checked;
+        const optFixTables = document.getElementById('check-fix-tables').checked;
+        const optCleanSpaces = document.getElementById('check-clean-spaces').checked;
+
+        const isBookOrNovelPreset = (currentPresetKey === 'buku_cetak' || currentPresetKey === 'novel_a5' || isMirror);
+
+        let countHeadings = 0;
+        let countPageBreaks = 0;
+        let countTables = 0;
+        let countQuotes = 0;
+        let countSections = 1;
+
+        // 1. Setup Styles XML (Inject Normal, Intense Quote & Heading styles)
+        addLog(`Menata Style Normal (First Line ${document.getElementById('param-indent').value} cm) & Heading 1-3...`, 'info');
+        const stylesXmlContent = buildStylesXml(fontName, fontHalfPt, lineSpacingVal, firstLineDxa);
+        zip.file("word/styles.xml", stylesXmlContent);
+
+        // 2. Setup Footer XMLs: Plain Number 2 (footer1) + Empty (footer2 for cover)
+        zip.file("word/footer1.xml", buildFooterXml());
+        zip.file("word/footer2.xml", buildEmptyFooterXml());
+        addLog('Footer Plain Number 2 (Bottom Center) siap.', 'info');
+
+        // Update word/_rels/document.xml.rels with footer relationships
+        const ftr1Rel = `<Relationship Id="rIdFtr1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>`;
+        const ftr2Rel = `<Relationship Id="rIdFtr2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer2.xml"/>`;
+        let relsXmlStr = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  ${ftr1Rel}
+  ${ftr2Rel}
+</Relationships>`;
+        const relsFile = zip.file("word/_rels/document.xml.rels");
+        if (relsFile) {
+          let origRels = await relsFile.async("string");
+          if (!origRels.includes("footer1.xml")) {
+            origRels = origRels.replace("</Relationships>", `${ftr1Rel}\n${ftr2Rel}\n</Relationships>`);
+          } else if (!origRels.includes("footer2.xml")) {
+            origRels = origRels.replace("</Relationships>", `${ftr2Rel}\n</Relationships>`);
+          }
+          relsXmlStr = origRels;
+        }
+        zip.file("word/_rels/document.xml.rels", relsXmlStr);
+
+        // Helper
+        function getOrCreate(parent, localName) {
+          let el = parent.getElementsByTagNameNS(wNS, localName)[0];
+          if (!el) {
+            el = xmlDoc.createElementNS(wNS, `w:${localName}`);
+            parent.appendChild(el);
+          }
+          return el;
+        }
+
+        function applySectionProperties(sectEl, isCover, isFrontMatter, isBody) {
+          // Page size
+          let pgSz = getOrCreate(sectEl, "pgSz");
+          pgSz.setAttributeNS(wNS, "w:w", paperW.toString());
+          pgSz.setAttributeNS(wNS, "w:h", paperH.toString());
+          pgSz.setAttributeNS(wNS, "w:code", paperCode);
+          pgSz.setAttributeNS(wNS, "w:orient", "portrait");
+
+          // Margins
+          let pgMar = getOrCreate(sectEl, "pgMar");
+          pgMar.setAttributeNS(wNS, "w:left", mLeftDxa.toString());
+          pgMar.setAttributeNS(wNS, "w:top", mTopDxa.toString());
+          pgMar.setAttributeNS(wNS, "w:right", mRightDxa.toString());
+          pgMar.setAttributeNS(wNS, "w:bottom", mBottomDxa.toString());
+          pgMar.setAttributeNS(wNS, "w:header", "851");
+          pgMar.setAttributeNS(wNS, "w:footer", "851");
+
+          // Mirror margins for printing
+          if (isMirror) {
+            getOrCreate(sectEl, "mirrorMargins");
+          }
+
+          // Section break type: Next Page
+          let typeEl = getOrCreate(sectEl, "type");
+          typeEl.setAttributeNS(wNS, "w:val", "nextPage");
+
+          // Page Numbering Rules
+          if (optPageNum) {
+            if (isCover) {
+              // Section 1 (Cover): Different First Page = true, header & footer kosong
+              getOrCreate(sectEl, "titlePg");
+              // Empty first-page footer reference
+              let ftrRefFirst = xmlDoc.createElementNS(wNS, "w:footerReference");
+              ftrRefFirst.setAttributeNS(wNS, "w:type", "first");
+              ftrRefFirst.setAttributeNS(rNS, "r:id", "rIdFtr2");
+              sectEl.appendChild(ftrRefFirst);
+              addLog('Section 1 (Cover): Different First Page aktif, nomor halaman kosong.', 'info');
+
+            } else if (isFrontMatter) {
+              // Section 2 (Bagian Awal): Romawi kecil (i, ii, iii), start 1
+              let pgNumType = getOrCreate(sectEl, "pgNumType");
+              pgNumType.setAttributeNS(wNS, "w:fmt", "lowerRoman");
+              pgNumType.setAttributeNS(wNS, "w:start", "1");
+              // Default footer: Plain Number 2 (bottom center)
+              let ftrRef = xmlDoc.createElementNS(wNS, "w:footerReference");
+              ftrRef.setAttributeNS(wNS, "w:type", "default");
+              ftrRef.setAttributeNS(rNS, "r:id", "rIdFtr1");
+              sectEl.appendChild(ftrRef);
+              addLog('Section 2 (Bagian Awal): Nomor Romawi (i, ii, iii) Bottom Center, start 1.', 'info');
+
+            } else if (isBody) {
+              // Section 3+ (Bagian Inti): Angka biasa (1, 2, 3)
+              let pgNumType = getOrCreate(sectEl, "pgNumType");
+              pgNumType.setAttributeNS(wNS, "w:fmt", "decimal");
+              if (isBody === "firstBab") {
+                pgNumType.setAttributeNS(wNS, "w:start", "1");
+                addLog('Section 3 (BAB I): Nomor Arab (1, 2, 3) Bottom Center, Start at = 1.', 'info');
+              }
+              // Default footer: Plain Number 2 (bottom center)
+              let ftrRef = xmlDoc.createElementNS(wNS, "w:footerReference");
+              ftrRef.setAttributeNS(wNS, "w:type", "default");
+              ftrRef.setAttributeNS(rNS, "r:id", "rIdFtr1");
+              sectEl.appendChild(ftrRef);
+            }
+          }
+        }
+
+        // 3. Process Paragraphs & Insert Section Breaks / Page Breaks
+        const bodyEl = xmlDoc.getElementsByTagNameNS(wNS, "body")[0];
+        const paragraphs = Array.from(xmlDoc.getElementsByTagNameNS(wNS, "p"));
+        
+        let coverEnded = false;
+        let isFirstBabSeen = false;
+        let currentSectionState = "cover"; // 'cover' | 'front' | 'body'
+
+        for (let i = 0; i < paragraphs.length; i++) {
+          const p = paragraphs[i];
+          
+          const textNodes = p.getElementsByTagNameNS(wNS, "t");
+          let fullText = "";
+          for (let t = 0; t < textNodes.length; t++) fullText += textNodes[t].textContent;
+          const trimmed = fullText.trim();
+
+          // Check if paragraph is in a table
+          let insideTable = false;
+          let parentNode = p.parentNode;
+          while (parentNode) {
+            if (parentNode.localName === "tc" || parentNode.localName === "tbl") {
+              insideTable = true; break;
+            }
+            parentNode = parentNode.parentNode;
+          }
+          if (insideTable) continue;
+
+          let pPr = getOrCreate(p, "pPr");
+
+          const isFront = isFrontMatterTitle(trimmed);
+          const isBab = isChapterTitle(trimmed);
+          const isHeading2 = /^[A-Z]\.\s+[A-Za-z0-9]/.test(trimmed) && trimmed.length < 90;
+          const isHeading3 = /^[0-9]+\.\s+[A-Za-z0-9]/.test(trimmed) && trimmed.length < 90;
+
+          // A. Bagian Awal Detection (Kata Pengantar, Daftar Isi, dsb)
+          if (isFront) {
+            countHeadings++;
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "Heading1");
+            
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "center");
+
+            // If this is the start of Bagian Awal after Cover, create Section Break
+            if (!coverEnded && optSectionBreaks && i > 0) {
+              // Create section break before this paragraph by adding sectPr to previous paragraph
+              const prevP = paragraphs[i - 1];
+              const prevPPr = getOrCreate(prevP, "pPr");
+              const secBreak = getOrCreate(prevPPr, "sectPr");
+              applySectionProperties(secBreak, true, false, false);
+              coverEnded = true;
+              currentSectionState = "front";
+              countSections++;
+              countPageBreaks++;
+              addLog(`Section Break Next Page dipasang setelah Sampul/Cover.`, 'info');
+            } else if (optPageBreakFront && i > 0) {
+              // Page Break in Section 2
+              getOrCreate(pPr, "pageBreakBefore");
+              countPageBreaks++;
+            }
+
+            getOrCreate(pPr, "keepNext");
+
+          // B. Bagian Inti Detection (BAB I, BAB II, DAFTAR PUSTAKA, dsb)
+          } else if (isBab) {
+            countHeadings++;
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "Heading1");
+            
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "center");
+
+            // Capitalize BAB
+            for (let t = 0; t < textNodes.length; t++) {
+              textNodes[t].textContent = textNodes[t].textContent.toUpperCase();
+            }
+
+            // Section Break Next Page before BAB
+            if (optSectionBreaks && i > 0) {
+              const prevP = paragraphs[i - 1];
+              const prevPPr = getOrCreate(prevP, "pPr");
+              const secBreak = getOrCreate(prevPPr, "sectPr");
+              
+              if (!isFirstBabSeen) {
+                applySectionProperties(secBreak, false, true, false);
+                isFirstBabSeen = true;
+                currentSectionState = "body";
+                addLog(`Section Break Next Page dipasang sebelum BAB I (Mulai Nomor Arab 1, 2, 3...).`, 'info');
+              } else {
+                applySectionProperties(secBreak, false, false, "contBab");
+              }
+              countSections++;
+              countPageBreaks++;
+            } else {
+              getOrCreate(pPr, "pageBreakBefore");
+              countPageBreaks++;
+            }
+
+            getOrCreate(pPr, "keepNext");
+
+          // C. Heading 2 (Sub-bab)
+          } else if (isHeading2) {
+            countHeadings++;
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "Heading2");
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "left");
+            getOrCreate(pPr, "keepNext");
+
+          // D. Heading 3 (Sub-sub-bab)
+          } else if (isHeading3) {
+            countHeadings++;
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "Heading3");
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "left");
+            getOrCreate(pPr, "keepNext");
+
+          // E. Intense Quote (Kutipan Teks Petik Dua > 1 Baris pada Novel & Buku Cetak)
+          } else if (optIntenseQuote && isBookOrNovelPreset && isMultiLineQuote(trimmed)) {
+            countQuotes++;
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "IntenseQuote");
+
+            let pBdr = getOrCreate(pPr, "pBdr");
+            let topB = getOrCreate(pBdr, "top");
+            topB.setAttributeNS(wNS, "w:val", "single");
+            topB.setAttributeNS(wNS, "w:sz", "6");
+            topB.setAttributeNS(wNS, "w:space", "4");
+            topB.setAttributeNS(wNS, "w:color", "1E40AF");
+
+            let btmB = getOrCreate(pBdr, "bottom");
+            btmB.setAttributeNS(wNS, "w:val", "single");
+            btmB.setAttributeNS(wNS, "w:sz", "6");
+            btmB.setAttributeNS(wNS, "w:space", "4");
+            btmB.setAttributeNS(wNS, "w:color", "1E40AF");
+
+            let ind = getOrCreate(pPr, "ind");
+            ind.setAttributeNS(wNS, "w:left", "720"); // 1.27 cm indent
+            ind.setAttributeNS(wNS, "w:right", "720");
+            ind.removeAttributeNS(wNS, "w:firstLine");
+
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "both");
+
+            let spacing = getOrCreate(pPr, "spacing");
+            spacing.setAttributeNS(wNS, "w:before", "180");
+            spacing.setAttributeNS(wNS, "w:after", "180");
+            spacing.setAttributeNS(wNS, "w:line", lineSpacingVal.toString());
+            spacing.setAttributeNS(wNS, "w:lineRule", "auto");
+
+            // Format text runs to Italic
+            const runs = p.getElementsByTagNameNS(wNS, "r");
+            for (let r = 0; r < runs.length; r++) {
+              const rPr = getOrCreate(runs[r], "rPr");
+              getOrCreate(rPr, "i");
+            }
+
+          // F. Normal Paragraph
+          } else {
+            let pStyle = getOrCreate(pPr, "pStyle");
+            pStyle.setAttributeNS(wNS, "w:val", "Normal");
+
+            let jc = getOrCreate(pPr, "jc");
+            jc.setAttributeNS(wNS, "w:val", "both");
+
+            let spacing = getOrCreate(pPr, "spacing");
+            spacing.setAttributeNS(wNS, "w:line", lineSpacingVal.toString());
+            spacing.setAttributeNS(wNS, "w:lineRule", "auto");
+
+            if (trimmed.length > 35) {
+              let ind = getOrCreate(pPr, "ind");
+              ind.setAttributeNS(wNS, "w:firstLine", firstLineDxa.toString());
+            }
+          }
+
+          // Clean double spaces
+          if (optCleanSpaces) {
+            for (let t = 0; t < textNodes.length; t++) {
+              textNodes[t].textContent = textNodes[t].textContent.replace(/ {2,}/g, ' ');
+            }
+          }
+        }
+
+        // 4. Apply Section Properties to the Final Section in <w:body>
+        let lastSectPr = bodyEl.getElementsByTagNameNS(wNS, "sectPr")[0];
+        if (!lastSectPr) {
+          lastSectPr = xmlDoc.createElementNS(wNS, "w:sectPr");
+          bodyEl.appendChild(lastSectPr);
+        }
+        applySectionProperties(lastSectPr, false, false, isFirstBabSeen ? "contBab" : "firstBab");
+
+        // 5. Format All Tables to APA 7th
+        const tables = xmlDoc.getElementsByTagNameNS(wNS, "tbl");
+        countTables = tables.length;
+        if (optFixTables && countTables > 0) {
+          for (let t = 0; t < tables.length; t++) {
+            const tbl = tables[t];
+            let tblPr = getOrCreate(tbl, "tblPr");
+            let tblBorders = tblPr.getElementsByTagNameNS(wNS, "tblBorders")[0];
+            if (tblBorders) tblPr.removeChild(tblBorders);
+
+            tblBorders = xmlDoc.createElementNS(wNS, "w:tblBorders");
+            
+            const topB = xmlDoc.createElementNS(wNS, "w:top");
+            topB.setAttributeNS(wNS, "w:val", "single");
+            topB.setAttributeNS(wNS, "w:sz", "6");
+            tblBorders.appendChild(topB);
+
+            const btmB = xmlDoc.createElementNS(wNS, "w:bottom");
+            btmB.setAttributeNS(wNS, "w:val", "single");
+            btmB.setAttributeNS(wNS, "w:sz", "6");
+            tblBorders.appendChild(btmB);
+
+            const leftB = xmlDoc.createElementNS(wNS, "w:left");
+            leftB.setAttributeNS(wNS, "w:val", "none");
+            tblBorders.appendChild(leftB);
+
+            const rightB = xmlDoc.createElementNS(wNS, "w:right");
+            rightB.setAttributeNS(wNS, "w:val", "none");
+            tblBorders.appendChild(rightB);
+
+            const insVB = xmlDoc.createElementNS(wNS, "w:insideV");
+            insVB.setAttributeNS(wNS, "w:val", "none");
+            tblBorders.appendChild(insVB);
+
+            const insHB = xmlDoc.createElementNS(wNS, "w:insideH");
+            insHB.setAttributeNS(wNS, "w:val", "none");
+            tblBorders.appendChild(insHB);
+
+            tblPr.appendChild(tblBorders);
+
+            // Header bottom border
+            const rows = tbl.getElementsByTagNameNS(wNS, "tr");
+            if (rows.length > 0) {
+              const cells = rows[0].getElementsByTagNameNS(wNS, "tc");
+              for (let c = 0; c < cells.length; c++) {
+                const tcPr = getOrCreate(cells[c], "tcPr");
+                const tcBorders = getOrCreate(tcPr, "tcBorders");
+                const btm = xmlDoc.createElementNS(wNS, "w:bottom");
+                btm.setAttributeNS(wNS, "w:val", "single");
+                btm.setAttributeNS(wNS, "w:sz", "6");
+                tcBorders.appendChild(btm);
+              }
+            }
+          }
+          addLog(`Format ${countTables} tabel ke APA 7th Style selesai.`, 'success');
+        }
+
+        // 6. Serialize and Download
+        const serializer = new XMLSerializer();
+        const updatedDocXml = serializer.serializeToString(xmlDoc);
+        zip.file("word/document.xml", updatedDocXml);
+
+        addLog('Mengemas file .docx hasil generate...', 'info');
+        const generatedBlob = await zip.generateAsync({
+          type: "blob",
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          compression: "DEFLATE"
+        });
+
+        // Update stats
+        document.getElementById('stat-sections').innerText = countSections;
+        document.getElementById('stat-headings').innerText = countHeadings;
+        document.getElementById('stat-pagebreaks').innerText = countPageBreaks;
+        document.getElementById('stat-quotes').innerText = countQuotes;
+        document.getElementById('stat-tables').innerText = countTables;
+
+        if (countQuotes > 0) {
+          addLog(`Format ${countQuotes} kutipan panjang (> 1 baris) menjadi Intense Quote style.`, 'success');
+        }
+
+        // Auto Download
+        const baseName = currentFile.name.replace('.docx', '');
+        const downloadFileName = `${baseName}_FORMATTED_${fontName}_${isMirror ? 'Mirror' : 'Standard'}.docx`;
+        
+        const url = URL.createObjectURL(generatedBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = downloadFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        addLog(`✅ Selesai! File terunduh: ${downloadFileName}`, 'success');
+
+      } catch (err) {
+        console.error(err);
+        addLog(`❌ Error: ${err.message}`, 'warn');
+        alert(`Gagal memproses dokumen: ${err.message}`);
+      } finally {
+        spinner.style.display = 'none';
+        btnText.innerText = '⚡ Format Sekarang & Download';
+        btnProcess.disabled = false;
+        document.getElementById('btn-reprocess').style.display = 'inline-flex';
+      }
+    }
+
+    // Built-in Sample Generator
+    async function loadSampleDocx() {
+      addLog('Membuat dokumen draft naskah lengkap (Sampul + Bagian Awal + Bab 1 + Bab 2 + Kutipan)...', 'info');
+      
+      const sampleZip = new JSZip();
+
+      sampleZip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`);
+
+      sampleZip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`);
+
+      const sampleDocXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <!-- HALAMAN SAMPUL / COVER (Section 1) -->
+    <w:p><w:r><w:t>PENGEMBANGAN SISTEM OTOMASI LAYOUT DOKUMEN KARYA ILMIAH</w:t></w:r></w:p>
+    <w:p><w:r><w:t>SKRIPSI</w:t></w:r></w:p>
+    <w:p><w:r><w:t>OLEH: FULAN ABDULLAH (NPM. 20310006)</w:t></w:r></w:p>
+    <w:p><w:r><w:t>UNIVERSITAS MUHAMMADIYAH METRO</w:t></w:r></w:p>
+    <w:p><w:r><w:t>2025</w:t></w:r></w:p>
+    
+    <!-- BAGIAN AWAL (Section 2 - Romawi: i, ii, iii) -->
+    <w:p><w:r><w:t>KATA PENGANTAR</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Puji syukur kita panjatkan ke hadirat Allah SWT atas segala rahmat dan karunia-Nya naskah ini dapat diselesaikan dengan baik.</w:t></w:r></w:p>
+    
+    <w:p><w:r><w:t>DAFTAR ISI</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Halaman ini memuat daftar bab dan sub-bab beserta nomor halaman tempat pemuatannya.</w:t></w:r></w:p>
+    
+    <!-- BAGIAN INTI (Section 3 - Angka: 1, 2, 3...) -->
+    <w:p><w:r><w:t>bab i pendahuluan</w:t></w:r></w:p>
+    <w:p><w:r><w:t>A. Latar Belakang Masalah</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Penyusunan karya ilmiah mahasiswa merupakan salah satu proses penting dalam jalur pendidikan tinggi. Penataan tata tulis yang rapi dan terstruktur akan meningkatkan nilai presentasi ilmiah.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>"Pendidikan bukan sekadar proses transfer ilmu pengetahuan semata, melainkan sarana pembentukan karakter dan daya kritis generasi penerus bangsa agar siap menghadapi berbagai dinamika perubahan peradaban di masa depan."</w:t></w:r></w:p>
+    <w:p><w:r><w:t>"Ini adalah dialog singkat."</w:t></w:r></w:p>
+    <w:p><w:r><w:t>B. Rumusan Masalah</w:t></w:r></w:p>
+    <w:p><w:r><w:t>1. Bagaimana merancang tools otomatisasi template dokumen Word?</w:t></w:r></w:p>
+    
+    <!-- BAB II -->
+    <w:p><w:r><w:t>bab ii kajian literatur</w:t></w:r></w:p>
+    <w:p><w:r><w:t>A. Landasan Teori</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Format dokumen berbasis OpenXML memungkinkan manipulasi langsung terhadap elemen XML tanpa perlu membuka software secara manual.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>“Karya sastra dan buku cetak yang berkualitas selalu memperhatikan estetika tata letak tipografi serta kenyamanan membaca bagi setiap pembacanya secara mendalam.”</w:t></w:r></w:p>
+    
+    <w:p><w:r><w:t>Tabel 1. Perbandingan Format Standar</w:t></w:r></w:p>
+    <w:tbl>
+      <w:tblPr/>
+      <w:tr>
+        <w:tc><w:p><w:r><w:t>No</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>Format</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>First Line Indent</w:t></w:r></w:p></w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc><w:p><w:r><w:t>1</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>Buku Cetak</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>0.68 cm</w:t></w:r></w:p></w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc><w:p><w:r><w:t>2</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>Karya Ilmiah Standar</w:t></w:r></w:p></w:tc>
+        <w:tc><w:p><w:r><w:t>1.27 cm</w:t></w:r></w:p></w:tc>
+      </w:tr>
+    </w:tbl>
+
+    <!-- BAB III -->
+    <w:p><w:r><w:t>bab iii penutup</w:t></w:r></w:p>
+    <w:p><w:r><w:t>A. Simpulan</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Sistem otomasi ini berhasil menyusun struktur dokumen secara akurat, cepat, dan sesuai pedoman.</w:t></w:r></w:p>
+
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+      sampleZip.file("word/document.xml", sampleDocXml);
+
+      const sampleBlob = await sampleZip.generateAsync({ type: "blob" });
+      const sampleFile = new File([sampleBlob], "Draft_Skripsi_Buku_Lengkap.docx", {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      });
+
+      handleFile(sampleFile);
+      addLog("Dokumen contoh naskah lengkap berhasil disiapkan! Silakan klik '⚡ Format Sekarang & Download'.", 'success');
+    }
+  </script>
+</body>
+</html>
