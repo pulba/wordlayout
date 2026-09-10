@@ -3,369 +3,641 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WordLayout Pro - MS Word Auto-Formatter & Generator</title>
+  <title>WordLayout Pro - Swiss Minimalist MS Word Auto-Formatter</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
   <style>
     :root {
-      --primary: #1E40AF;
-      --primary-hover: #1D4ED8;
-      --secondary: #0F172A;
-      --accent: #0D9488;
-      --accent-hover: #0F766E;
-      --neutral-bg: #F8FAFC;
-      --surface: #FFFFFF;
-      --surface-border: #E2E8F0;
-      --text-primary: #0F172A;
-      --text-secondary: #475569;
-      --text-muted: #94A3B8;
-      --danger: #EF4444;
-      --success: #10B981;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.03);
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Swiss International Typographic Palette */
+      --bg-page: #F4F4F5;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #FAFAFA;
+      --bg-dark: #09090B;
+      
+      --border-hairline: #E4E4E7;
+      --border-medium: #D4D4D8;
+      --border-bold: #09090B;
+      
+      --text-primary: #09090B;
+      --text-secondary: #52525B;
+      --text-muted: #71717A;
+      --text-inverse: #FFFFFF;
+      
+      --swiss-red: #E11D48;
+      --swiss-red-hover: #BE123C;
+
+      --status-ready: #16A34A;
+      --status-ready-bg: #F0FDF4;
+      --status-ready-border: #BBF7D0;
+
+      --radius-none: 0px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
 
     body {
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: var(--neutral-bg);
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
       color: var(--text-primary);
-      line-height: 1.6;
-      padding-bottom: 60px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 40px;
     }
 
+    /* Minimalist Topbar */
     header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--surface-border);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
       position: sticky;
       top: 0;
       z-index: 50;
+      width: 100%;
     }
 
     .nav-container {
-      max-width: 1280px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 14px 24px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .logo-badge {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--primary), #3B82F6);
-      color: #FFFFFF;
+      width: 30px;
+      height: 30px;
+      background: var(--bg-dark);
+      color: var(--text-inverse);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      border-radius: var(--radius-md);
-      font-size: 1.2rem;
-      box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+      font-size: 1rem;
+      border-radius: var(--radius-none);
     }
 
     .brand-text h1 {
-      font-size: 1.15rem;
+      font-size: 0.95rem;
       font-weight: 800;
-      color: var(--secondary);
-      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-transform: uppercase;
     }
 
-    .brand-text p {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
     .nav-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
-      background: #ECFDF5;
-      color: #065F46;
-      border: 1px solid #A7F3D0;
-      border-radius: 9999px;
-      font-size: 0.8rem;
+      padding: 5px 10px;
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border: 1px solid var(--border-medium);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
     }
 
     .nav-badge::before {
       content: '';
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--success);
+      width: 6px;
+      height: 6px;
+      background: var(--swiss-red);
+      flex-shrink: 0;
     }
 
+    /* Container */
     .container {
-      max-width: 1280px;
-      margin: 24px auto;
-      padding: 0 24px;
+      max-width: 1240px;
+      margin: 16px auto;
+      padding: 0 16px;
+      width: 100%;
     }
 
-    .hero {
-      background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 45%, #0D9488 100%);
-      color: white;
-      border-radius: var(--radius-lg);
-      padding: 28px 32px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .hero-content h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .hero-content p {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      max-width: 760px;
-    }
-
+    /* Buttons */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
-      font-weight: 600;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-none);
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-sans);
       cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
       text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
     }
 
-    .btn-primary { background-color: var(--primary); color: white; }
-    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-    .btn-accent { background-color: var(--accent); color: white; }
-    .btn-accent:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
-    .btn-success { background-color: var(--success); color: white; }
-    .btn-success:hover { background-color: #059669; transform: translateY(-1px); }
-    .btn-white { background-color: white; color: var(--primary); font-weight: 700; }
-    .btn-white:hover { background-color: #F1F5F9; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
 
+    .btn-primary {
+      background-color: var(--bg-dark);
+      color: var(--text-inverse);
+      border-color: var(--bg-dark);
+    }
+    .btn-primary:hover {
+      background-color: #27272A;
+      border-color: #27272A;
+    }
+
+    .btn-accent {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-bold);
+    }
+    .btn-accent:hover {
+      background-color: var(--bg-dark);
+      color: var(--text-inverse);
+    }
+
+    .btn-success {
+      background-color: var(--swiss-red);
+      color: var(--text-inverse);
+      border-color: var(--swiss-red);
+    }
+    .btn-success:hover {
+      background-color: var(--swiss-red-hover);
+      border-color: var(--swiss-red-hover);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.72rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Asymmetric Modular Grid */
     .grid-main {
       display: grid;
-      grid-template-columns: 410px 1fr;
-      gap: 24px;
+      grid-template-columns: 390px 1fr;
+      gap: 16px;
+      align-items: start;
+      width: 100%;
     }
 
-    @media (max-width: 1000px) {
-      .grid-main { grid-template-columns: 1fr; }
-    }
-
+    /* Cards */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-none);
+      padding: 18px;
+      margin-bottom: 16px;
+      width: 100%;
+      overflow: hidden;
     }
 
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--surface-border);
+      border-bottom: 1px solid var(--border-hairline);
     }
 
     .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--secondary);
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--swiss-red);
+    }
+
+    /* Presets */
+    .preset-list {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .dropzone {
-      border: 2px dashed #93C5FD;
-      background: #F0F7FF;
-      border-radius: var(--radius-lg);
-      padding: 36px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-
-    .dropzone:hover, .dropzone.dragover {
-      border-color: var(--primary);
-      background: #E0EFFF;
-      transform: scale(1.01);
-    }
-
-    .dropzone-icon { font-size: 2.8rem; margin-bottom: 10px; display: block; }
-    .dropzone-title { font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 4px; }
-    .dropzone-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px; }
-    .file-input { display: none; }
-
-    .file-loaded-info {
-      display: none;
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      border-radius: var(--radius-md);
-      padding: 14px;
-      margin-top: 16px;
-    }
-
-    .file-loaded-info.show { display: block; animation: fadeIn 0.3s ease; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .preset-list { display: flex; flex-direction: column; gap: 10px; }
-
     .preset-item {
-      padding: 14px;
-      border: 2px solid var(--surface-border);
-      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-none);
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: white;
+      transition: all 0.15s ease;
+      background: var(--bg-surface);
+      position: relative;
     }
 
-    .preset-item:hover { border-color: #93C5FD; background: #F8FAFC; }
-    .preset-item.active { border-color: var(--primary); background: #EFF6FF; }
+    .preset-item:hover {
+      border-color: var(--border-bold);
+      background: var(--bg-subtle);
+    }
+
+    .preset-item.active {
+      border: 2px solid var(--border-bold);
+      background: #FFFFFF;
+      padding: 11px 13px;
+    }
+
+    .preset-item.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--swiss-red);
+    }
 
     .preset-title {
       font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--secondary);
+      font-size: 0.85rem;
+      color: var(--text-primary);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
       margin-bottom: 4px;
+      line-height: 1.3;
     }
 
-    .preset-desc { font-size: 0.8rem; color: var(--text-secondary); }
-    .preset-tag {
+    .preset-index-num {
+      font-family: var(--font-mono);
       font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      background: var(--surface-border);
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    .preset-desc {
+      font-size: 0.75rem;
       color: var(--text-secondary);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .preset-desc strong {
+      color: var(--text-primary);
       font-weight: 600;
     }
-    .preset-item.active .preset-tag { background: var(--primary); color: white; }
 
+    .preset-tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-none);
+      background: var(--bg-page);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .preset-item.active .preset-tag {
+      background: var(--bg-dark);
+      border-color: var(--bg-dark);
+      color: var(--text-inverse);
+    }
+
+    /* Form Grid */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .form-group label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .form-control {
+      width: 100%;
+      min-width: 0;
+      padding: 7px 9px;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-none);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--border-bold);
+      box-shadow: 0 0 0 1px var(--border-bold);
+    }
+
+    /* Check List */
+    .check-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .check-item strong {
+      color: var(--text-primary);
+    }
+
+    .check-item input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      margin-top: 2px;
+      accent-color: var(--bg-dark);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 1px dashed var(--border-bold);
+      background: var(--bg-subtle);
+      border-radius: var(--radius-none);
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow-wrap: anywhere;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--swiss-red);
+      background: #FFFFFF;
+      box-shadow: inset 0 0 0 1px var(--swiss-red);
+    }
+
+    .dropzone-icon {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      display: block;
+      color: var(--text-primary);
+    }
+
+    .dropzone-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .dropzone-desc {
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .file-input { display: none; }
+
+    /* Loaded file banner */
+    .file-loaded-info {
+      display: none;
+      background: var(--status-ready-bg);
+      border: 1px solid var(--status-ready-border);
+      padding: 12px 14px;
       margin-top: 14px;
     }
 
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
-    .form-control {
-      padding: 8px 10px;
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-sm);
-      font-family: inherit;
-      font-size: 0.85rem;
-      color: var(--text-primary);
-      background: #FFFFFF;
-    }
-    .form-control:focus { outline: 2px solid var(--primary); }
+    .file-loaded-info.show { display: block; }
 
-    .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-    .check-item {
+    .file-loaded-flex {
       display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 10px;
-      font-size: 0.85rem;
-      color: var(--secondary);
-      font-weight: 500;
-    }
-    .check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
-
-    .stat-card {
-      background: #F8FAFC;
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      padding: 14px;
-      text-align: center;
-    }
-
-    .stat-num { font-size: 1.5rem; font-weight: 800; color: var(--primary); line-height: 1.2; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; font-weight: 600; }
-
-    .log-box {
-      background: #0F172A;
-      color: #E2E8F0;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.8rem;
-      padding: 16px;
-      border-radius: var(--radius-md);
-      max-height: 240px;
-      overflow-y: auto;
-      line-height: 1.6;
-    }
-
-    .log-item { display: flex; gap: 8px; }
-    .log-time { color: #64748B; }
-    .log-success { color: #34D399; }
-    .log-info { color: #60A5FA; }
-    .log-warn { color: #FBBF24; }
-
+    /* Action bar */
     .action-bar {
       display: flex;
-      gap: 14px;
+      gap: 10px;
       align-items: center;
-      margin-top: 20px;
+      margin-top: 16px;
       flex-wrap: wrap;
     }
 
     .loading-spinner {
       display: none;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
       border-top-color: white;
-      animation: spin 0.8s linear infinite;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Metrics Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border: 1px solid var(--border-medium);
+      background: var(--bg-surface);
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .stat-card {
+      padding: 14px 6px;
+      text-align: center;
+      border-right: 1px solid var(--border-hairline);
+      min-width: 0;
+    }
+
+    .stat-card:last-child {
+      border-right: none;
+    }
+
+    .stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.62rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+
+    /* Terminal Audit Log */
+    .log-box {
+      background: var(--bg-dark);
+      color: #E4E4E7;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 14px;
+      border: 1px solid var(--border-bold);
+      max-height: 220px;
+      overflow-y: auto;
+      overflow-x: auto;
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .log-item {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .log-time { color: #71717A; flex-shrink: 0; }
+    .log-success { color: #4ADE80; font-weight: 600; }
+    .log-info { color: #93C5FD; }
+    .log-warn { color: #FCD34D; }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 960px) {
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .stat-card {
+        border-bottom: 1px solid var(--border-hairline);
+      }
+      .stat-card:nth-child(3n) {
+        border-right: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 14px;
+      }
+      .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .nav-badge {
+        max-width: calc(100% - 130px);
+      }
+      .container {
+        padding: 0 10px;
+        margin: 10px auto;
+      }
+      .card {
+        padding: 14px 12px;
+        margin-bottom: 12px;
+      }
+      .action-bar .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .stat-card:nth-child(2n) {
+        border-right: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -375,30 +647,17 @@
       <div class="brand">
         <div class="logo-badge">W</div>
         <div class="brand-text">
-          <h1>WordLayout Pro <span>⚡ Section & Page Break Engine</span></h1>
-          <p>Mirror Margins, Indent 0.68cm, Roman/Arabic Bottom Center Page Numbers</p>
+          <h1>WordLayout Pro</h1>
         </div>
       </div>
-      <div class="nav-links">
+      <div class="nav-actions">
         <span class="nav-badge" id="nav-preset-badge">Karya Ilmiah Standar (Arial 11pt)</span>
-        <button class="btn btn-accent" onclick="loadSampleDocx()">🧪 Test Sample Dokumen</button>
+        <button class="btn btn-sm btn-accent" onclick="loadSampleDocx()">🧪 Test Sample</button>
       </div>
     </div>
   </header>
 
   <div class="container">
-    
-    <!-- Hero Banner -->
-    <div class="hero">
-      <div class="hero-content">
-        <h2>Format Dokumen Word Otomatis (Section Break + Page Break + Mirror)</h2>
-        <p>Cover terpisah otomatis <strong>Section Break Next Page</strong> (Different First Page), Bagian Awal bernomor <strong>Romawi (i, ii, iii)</strong>, Bagian Inti BAB 1 s.d. seterusnya bernomor <strong>Angka (1, 2, 3)</strong> di <strong>Bottom Center</strong>, serta dukungan <strong>Mirror Margins</strong> untuk buku cetak!</p>
-      </div>
-      <div class="hero-actions">
-        <button class="btn btn-white" onclick="document.getElementById('file-input').click()">📂 Pilih File .docx</button>
-      </div>
-    </div>
-
     <!-- Main Grid -->
     <div class="grid-main">
       
@@ -408,40 +667,40 @@
         <!-- Preset Selector -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">⚙️ Preset Layout</span>
+            <span class="card-title"><span class="section-num">01 /</span> Preset Dokumen</span>
           </div>
           <div class="preset-list">
             
             <div class="preset-item active" id="p-ummetro" onclick="selectPreset('ummetro')">
               <div class="preset-title">
-                <span>Karya Ilmiah Standar (4-3-3-3)</span>
+                <span><span class="preset-index-num">[01]</span> Karya Ilmiah Standar</span>
                 <span class="preset-tag">Official</span>
               </div>
-              <p class="preset-desc">Arial 11pt, Margin Kiri 4cm Atas/Kanan/Bawah 3cm, Spasi 1.5, Indent 1.27cm, Page Break per Bab, Tabel APA, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+              <p class="preset-desc">Arial 11pt, Margin 4-3-3-3 cm, Spasi 1.5, Indent 1.27cm, Page Break per Bab, Tabel APA, <strong>Nomor Bottom Center</strong>.</p>
             </div>
 
             <div class="preset-item" id="p-buku_cetak" onclick="selectPreset('buku_cetak')">
               <div class="preset-title">
-                <span>Buku Cetak (Mirror Margins)</span>
+                <span><span class="preset-index-num">[02]</span> Buku Cetak (Mirror)</span>
                 <span class="preset-tag">Buku Cetak</span>
               </div>
-              <p class="preset-desc"><strong>Mirror Margins Aktif</strong>, Indent First-Line <strong>0.68 cm</strong>, Book Antiqua 10.5pt, Spasi 1.15, B5, <em>Auto Intense Quote ("...")</em>, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+              <p class="preset-desc"><strong>Mirror Margins</strong>, Indent <strong>0.68 cm</strong>, Book Antiqua 10.5pt, Spasi 1.15, B5, <em>Auto Intense Quote</em>.</p>
             </div>
 
             <div class="preset-item" id="p-nasional" onclick="selectPreset('nasional')">
               <div class="preset-title">
-                <span>Skripsi Standar (4-4-3-3)</span>
+                <span><span class="preset-index-num">[03]</span> Skripsi Standar</span>
                 <span class="preset-tag">Nasional</span>
               </div>
-              <p class="preset-desc">Times New Roman 12pt, Margin 4-4-3-3, Spasi 2.0 (Double), Justify, Indent 1.27cm, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+              <p class="preset-desc">Times New Roman 12pt, Margin 4-4-3-3 cm, Spasi 2.0, Justify, Indent 1.27cm, <strong>Nomor Bottom Center</strong>.</p>
             </div>
 
             <div class="preset-item" id="p-novel_a5" onclick="selectPreset('novel_a5')">
               <div class="preset-title">
-                <span>Novel Cetak (A5 Mirror)</span>
+                <span><span class="preset-index-num">[04]</span> Novel Cetak (A5)</span>
                 <span class="preset-tag">Novel</span>
               </div>
-              <p class="preset-desc">Mirror Margins, Indent 0.68 cm, Garamond 11pt, A5 (14.8x21cm), Spasi 1.15, <em>Auto Intense Quote ("...")</em>, <strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1).</p>
+              <p class="preset-desc">Mirror Margins, Indent 0.68 cm, Garamond 11pt, A5, Spasi 1.15, <em>Auto Intense Quote</em>.</p>
             </div>
 
           </div>
@@ -450,7 +709,7 @@
         <!-- Detail Parameters -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">🎛️ Konfigurasi Halaman & Section</span>
+            <span class="card-title"><span class="section-num">02 /</span> Parameter & Tata Letak</span>
           </div>
           <div class="form-grid">
             <div class="form-group">
@@ -465,7 +724,7 @@
               <label>Multiple Pages</label>
               <select id="param-multiple-pages" class="form-control">
                 <option value="normal">Normal</option>
-                <option value="mirror">Mirror Margins (Cetak Buku)</option>
+                <option value="mirror">Mirror Margins (Cetak)</option>
               </select>
             </div>
             <div class="form-group">
@@ -500,7 +759,7 @@
               <input type="number" id="param-indent" class="form-control" value="1.27" step="0.01">
             </div>
             <div class="form-group">
-              <label>Margin Kiri / Inside (cm)</label>
+              <label>Margin Kiri / In (cm)</label>
               <input type="number" id="param-m-left" class="form-control" value="4.0" step="0.1">
             </div>
             <div class="form-group">
@@ -508,7 +767,7 @@
               <input type="number" id="param-m-top" class="form-control" value="3.0" step="0.1">
             </div>
             <div class="form-group">
-              <label>Margin Kanan / Outside (cm)</label>
+              <label>Margin Kanan / Out (cm)</label>
               <input type="number" id="param-m-right" class="form-control" value="3.0" step="0.1">
             </div>
             <div class="form-group">
@@ -520,27 +779,27 @@
           <div class="check-list">
             <label class="check-item">
               <input type="checkbox" id="check-section-breaks" checked>
-              <span><strong>Section Break Next Page</strong> (Setelah Cover & Sebelum Bab)</span>
+              <span><strong>Section Break Next Page</strong> (Cover & Bab)</span>
             </label>
             <label class="check-item">
               <input type="checkbox" id="check-pagebreak-front" checked>
-              <span><strong>Page Break</strong> pada Heading 1 di Bagian Awal</span>
+              <span><strong>Page Break</strong> Heading 1 Bagian Awal</span>
             </label>
             <label class="check-item">
               <input type="checkbox" id="check-pagenum-rule" checked>
-              <span><strong>Nomor Bottom Center</strong> (Cover: Kosong, Awal: i, Inti: 1)</span>
+              <span><strong>Nomor Bottom Center</strong> (Awal: i, Inti: 1)</span>
             </label>
             <label class="check-item">
               <input type="checkbox" id="check-intense-quote" checked>
-              <span><strong>Intense Quote Otomatis</strong> untuk Kutipan Panjang ("...") di Buku & Novel</span>
+              <span><strong>Intense Quote</strong> Kutipan Panjang ("...")</span>
             </label>
             <label class="check-item">
               <input type="checkbox" id="check-fix-tables" checked>
-              <span>Format Tabel Standar APA 7th (Tanpa Border Vertikal)</span>
+              <span>Format Tabel APA 7th (Tanpa Border Vertikal)</span>
             </label>
             <label class="check-item">
               <input type="checkbox" id="check-clean-spaces" checked>
-              <span>Bersihkan Spasi Ganda & Tanda Baca Menggantung</span>
+              <span>Bersihkan Spasi Ganda & Tanda Baca</span>
             </label>
           </div>
         </div>
@@ -552,32 +811,31 @@
         
         <div class="card">
           <div class="card-header">
-            <span class="card-title">📥 Upload File Word (.docx)</span>
-            <span style="font-size: 0.8rem; color: var(--text-secondary);" id="file-size-status">Format .docx didukung</span>
+            <span class="card-title"><span class="section-num">03 /</span> Unggah Dokumen Word (.docx)</span>
           </div>
 
           <input type="file" id="file-input" class="file-input" accept=".docx" onchange="handleFileSelect(event)">
           
           <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
             <span class="dropzone-icon">📄</span>
-            <div class="dropzone-title">Tarik & Lepas File .docx ke Sini</div>
-            <div class="dropzone-desc">atau klik untuk memilih file dari komputer kamu</div>
+            <div class="dropzone-title">Tarik & Lepas File .docx</div>
+            <div class="dropzone-desc">atau klik untuk memilih file dari komputer</div>
             <button class="btn btn-primary" type="button">Pilih Dokumen Word</button>
           </div>
 
           <div class="file-loaded-info" id="file-loaded-info">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="file-loaded-flex">
               <div>
-                <strong id="loaded-file-name" style="color: #065F46; font-size: 0.95rem;">document.docx</strong>
-                <div id="loaded-file-meta" style="font-size: 0.8rem; color: #047857; margin-top: 2px;">Ukuran: 0 KB | Tipe: Dokumen Word OpenXML</div>
+                <strong id="loaded-file-name" style="color: #166534; font-size: 0.88rem; font-family: var(--font-mono);">document.docx</strong>
+                <div id="loaded-file-meta" style="font-size: 0.72rem; color: #15803D; font-family: var(--font-mono); margin-top: 2px;">Ukuran: 0 KB</div>
               </div>
-              <span class="nav-badge">Siap Diformat</span>
+              <span class="nav-badge" style="background: #DCFCE7; border-color: #86EFAC; color: #166534;">Siap Diformat</span>
             </div>
           </div>
 
           <!-- Action Buttons -->
           <div class="action-bar">
-            <button class="btn btn-success" id="btn-process" onclick="processAndGenerateDocx()" disabled style="font-size: 1rem; padding: 12px 24px;">
+            <button class="btn btn-success" id="btn-process" onclick="processAndGenerateDocx()" disabled style="padding: 12px 22px;">
               <span class="loading-spinner" id="loading-spinner"></span>
               <span id="btn-process-text">⚡ Format Sekarang & Download</span>
             </button>
@@ -592,34 +850,33 @@
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-num" id="stat-sections">0</div>
-            <div class="stat-label">Section Dikelola</div>
+            <div class="stat-label">Section</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-headings">0</div>
-            <div class="stat-label">Heading Terstruktur</div>
+            <div class="stat-label">Heading</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-pagebreaks">0</div>
-            <div class="stat-label">Page/Section Breaks</div>
+            <div class="stat-label">Page Breaks</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-quotes">0</div>
-            <div class="stat-label">Intense Quotes</div>
+            <div class="stat-label">Quotes</div>
           </div>
           <div class="stat-card">
             <div class="stat-num" id="stat-tables">0</div>
-            <div class="stat-label">Tabel APA Style</div>
+            <div class="stat-label">Tabel APA</div>
           </div>
         </div>
 
         <!-- Activity Audit Log -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">📝 Log Pemrosesan OpenXML Engine</span>
-            <span style="font-size: 0.75rem; color: var(--text-secondary);">Section & Footer Builder</span>
+            <span class="card-title"><span class="section-num">04 /</span> Log Audit Pemrosesan</span>
           </div>
           <div class="log-box" id="log-box">
-            <div class="log-item"><span class="log-time">[System]</span> <span class="log-info">WordLayout Pro Engine Siap. Unggah file .docx atau klik tombol 'Test Sample Dokumen'.</span></div>
+            <div class="log-item"><span class="log-time">[System]</span> <span class="log-info">Engine Siap. Unggah file .docx atau klik 'Test Sample'.</span></div>
           </div>
         </div>
 
